@@ -140,15 +140,10 @@
             padding: 20px;
         }
 
-
-
         @keyframes correctAnim {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
             }
-
             50% {
                 transform: scale(1.1);
                 background: #90EE90 !important;
@@ -156,19 +151,33 @@
         }
 
         @keyframes wrongAnim {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateX(0);
             }
-
             20% {
                 transform: translateX(-6px);
             }
-
             80% {
                 transform: translateX(6px);
             }
+        }
+
+        /* NEW: Added fadeZoomIn animation for question transitions */
+        @keyframes fadeZoomIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* NEW: Label pulse animation for selected options */
+        @keyframes labelPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
         }
 
         .exam-content {
@@ -199,8 +208,9 @@
 
         .controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             margin: 15px 0;
+            gap: 5px;
         }
 
         .controls button {
@@ -212,11 +222,23 @@
             border-radius: 6px;
             font-size: 16px;
             transition: 0.3s;
+            flex: 1;
+            max-width: 120px;
         }
 
         .controls button:hover {
             background: #ff00ae;
             transform: scale(1.05);
+        }
+
+        /* NEW: Styles for voice buttons */
+        #voiceBtn.listening {
+            background: #ff6b6b !important;
+            animation: pulse 1s infinite;
+        }
+
+        #speakBtn:hover {
+            background: #28a745;
         }
 
         .options {
@@ -236,6 +258,39 @@
             border-radius: 8px;
             transition: all 0.2s;
             user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* NEW: Gap for label + value */
+            position: relative;
+        }
+
+        /* NEW: Option label styles (A, B, C, D badges) */
+        .option-label {
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 25px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            color: #fff;
+            background: linear-gradient(135deg, #4169e1, #1e90ff);
+            transition: all 0.3s ease;
+            animation: none;
+        }
+
+        .option:hover .option-label {
+            background: linear-gradient(135deg, #ff4500, #ff6347);
+            transform: scale(1.1);
+        }
+
+        .option.correct .option-label {
+            background: linear-gradient(135deg, #32cd32, #90ee90) !important;
+            animation: labelPulse 0.6s ease-out;
+        }
+
+        .option.wrong .option-label {
+            background: linear-gradient(135deg, #ff4500, #dc143c) !important;
+            animation: wrongAnim 0.5s;
         }
 
         .option:hover {
@@ -264,6 +319,14 @@
             color: #555;
             font-style: italic;
             font-size: 14px;
+        }
+
+        /* UPDATED: Hint to include voice instructions for letters */
+        .keyboard-hint::after {
+            content: " | Z/X/C/V = A/B/C/D Options | N=Next | B=Back | Type/Say Number or A/B/C/D";
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
         }
 
         /* RIGHT PANEL */
@@ -297,12 +360,9 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 opacity: 1;
             }
-
             50% {
                 opacity: 0.7;
             }
@@ -351,10 +411,12 @@
             cursor: pointer;
             border-radius: 4px;
             font-weight: bold;
+            transition: all 0.2s;
         }
 
         .grid-cell:hover {
             background: #ddd;
+            transform: scale(1.1);
         }
 
         .grid-cell.answered {
@@ -416,6 +478,11 @@
             margin: 10px 0;
             border-left: 5px solid #008080;
             border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .history-item.correct {
@@ -448,6 +515,11 @@
             text-align: center;
             border-radius: 8px;
             font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
         }
 
         .question-result {
@@ -466,6 +538,62 @@
         .question-result.wrong {
             border-left-color: red;
             background: #f5e8e8;
+        }
+
+        /* NEW: Responsive design for mobile */
+        @media (max-width: 768px) {
+            .exam-content {
+                flex-direction: column;
+                height: auto;
+                gap: 15px;
+            }
+
+            .right-panel {
+                width: 100%;
+                order: 2;
+            }
+
+            .question {
+                font-size: 22px;
+            }
+
+            .option {
+                font-size: 18px;
+                padding: 15px;
+                flex-direction: column;
+                gap: 5px; /* NEW: Stack label on mobile */
+            }
+
+            .option-label {
+                align-self: flex-start;
+                font-size: 16px;
+            }
+
+            .progress-grid {
+                grid-template-columns: repeat(5, 1fr);
+                max-height: none;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .controls button {
+                max-width: none;
+                flex: 1 1 45%;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .nav {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -549,10 +677,12 @@
                     <div class="options" id="options"></div>
                     <div class="keyboard-hint">Z X C V = Options | N=Next | B=Back | Type Answer</div>
 
-                    <!-- CONTROLS -->
+                    <!-- CONTROLS - UPDATED: Added voice buttons -->
                     <div class="controls">
                         <button onclick="prevQuestion()">Previous (B)</button>
                         <button onclick="nextQuestion()">Next (N)</button>
+                        <button id="speakBtn" onclick="speakQuestion()">🔊</button>
+                        <button id="voiceBtn" onclick="toggleVoiceInput()">🎤</button>
                         <button onclick="endTest()">End Test</button>
                     </div>
                 </div>
@@ -635,6 +765,167 @@
         const TIME_OPTIONS = { 300: "5 Min", 600: "10 Min", 900: "15 Min", 1200: "20 Min", 1500: "25 Min" };
         let selectedTime = 600;
 
+        let recognition = null; // For speech recognition
+        let isListening = false; // Track voice input state
+
+        // UPDATED: Letter-to-index map for voice/keyboard (A=0, B=1, etc.)
+        const letterMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+
+        // UPDATED: Renamed & extended from speechToNumber to handle letters (A-D) + numbers
+        function parseVoiceInput(transcript) {
+            const lowerTranscript = transcript.toLowerCase().trim();
+
+            // Handle letter inputs (e.g., "A", "option A", "B")
+            if (lowerTranscript.match(/^(option\s+)?([a-d])$/)) {
+                const letter = lowerTranscript.match(/[a-d]/)[0];
+                return { type: 'letter', index: letterMap[letter] };
+            }
+
+            // Handle number inputs (existing logic)
+            let num = parseInt(transcript);
+            if (!isNaN(num)) return { type: 'number', value: num };
+
+            // Fallback to word-based number parsing (e.g., "sixty")
+            let result = 0;
+            let temp = 0;
+            const words = lowerTranscript.replace(/[^\w\s]/g, ' ').split(/\s+/).filter(w => w.length > 0);
+
+            const wordMap = { // Existing word map
+                'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+                'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19,
+                'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90,
+                'hundred': 100, 'thousand': 1000
+            };
+
+            for (let word of words) {
+                if (/\d/.test(word)) {
+                    const dig = parseInt(word);
+                    if (dig < 100) temp += dig;
+                    else { temp *= dig; result += temp; temp = 0; }
+                    continue;
+                }
+                if (!(word in wordMap)) continue;
+                const val = wordMap[word];
+                if (val < 100) temp += val;
+                else { temp *= val; result += temp; temp = 0; }
+            }
+            result += temp;
+            return result > 0 ? { type: 'number', value: result } : null;
+        }
+
+        // Initialize speech recognition
+        function initRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true; // Continuous for persistent listening
+                recognition.interimResults = false; // Process only final results
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    const btn = document.getElementById('voiceBtn');
+                    btn.textContent = '⏹';
+                    btn.classList.add('listening');
+                };
+
+                recognition.onend = function() {
+                    if (isListening) {
+                        // Restart if ended unexpectedly
+                        setTimeout(() => {
+                            if (isListening && document.getElementById('exam').style.display === 'block') {
+                                recognition.start();
+                            }
+                        }, 100);
+                    } else {
+                        const btn = document.getElementById('voiceBtn');
+                        btn.textContent = '🎤';
+                        btn.classList.remove('listening');
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.log('Speech recognition error:', event.error);
+                    if (isListening) {
+                        setTimeout(() => recognition.start(), 500);
+                    } else {
+                        alert('Voice input error. Please try again. (Ensure microphone permission is granted)');
+                    }
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[event.results.length - 1][0].transcript;
+                    const parsed = parseVoiceInput(transcript);
+                    if (parsed) {
+                        const q = questions[currentQuestion];
+                        if (parsed.type === 'letter') {
+                            const index = parsed.index;
+                            if (index < q.options.length) {
+                                selectOption(q.options[index]);
+                            } else {
+                                showVoiceFeedback('Invalid option letter.');
+                            }
+                        } else if (parsed.type === 'number') {
+                            if (q.options.includes(parsed.value)) {
+                                selectOption(parsed.value);
+                            } else {
+                                showVoiceFeedback('Number not in options.');
+                            }
+                        }
+                    } else {
+                        showVoiceFeedback('Could not understand. Say A/B/C/D or a number.');
+                    }
+                    // Do NOT stop; continue listening
+                };
+            } else {
+                // Hide voice buttons if not supported
+                document.getElementById('voiceBtn').style.display = 'none';
+                document.getElementById('speakBtn').style.display = 'none';
+            }
+        }
+
+        // NEW: Non-blocking voice feedback function (avoids duplicates)
+        function showVoiceFeedback(message) {
+            const hint = document.querySelector('.keyboard-hint');
+            // Remove existing temp hint if any
+            const existing = hint.nextElementSibling;
+            if (existing && existing.textContent.includes('Invalid')) existing.remove();
+
+            hint.style.color = '#ff6b6b';
+            setTimeout(() => { hint.style.color = '#555'; }, 2000);
+
+            const tempHint = document.createElement('div');
+            tempHint.textContent = message;
+            tempHint.style.cssText = 'color: #ff6b6b; font-size: 12px; text-align: center; margin: 5px 0; animation: fadeZoomIn 0.3s;';
+            hint.parentNode.insertBefore(tempHint, hint.nextSibling);
+            setTimeout(() => tempHint.remove(), 3000);
+        }
+
+        // Toggle voice input - persistent across questions
+        function toggleVoiceInput() {
+            if (!recognition) return;
+            if (isListening) {
+                isListening = false;
+                recognition.stop();
+            } else {
+                isListening = true;
+                recognition.start();
+            }
+        }
+
+        // Speak the current question using TTS
+        function speakQuestion() {
+            if ('speechSynthesis' in window) {
+                const qText = document.getElementById('questionText').textContent;
+                const utterance = new SpeechSynthesisUtterance(qText);
+                utterance.rate = 0.8;
+                utterance.pitch = 1.1;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech not supported in this browser.');
+            }
+        }
+
         // Update timer display + restart timer with new value
         function updateTimerOnChange() {
             selectedTime = parseInt(document.getElementById('timeSelect').value);
@@ -645,7 +936,6 @@
             document.getElementById('timer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
             document.getElementById('timeDisplay').textContent = TIME_OPTIONS[selectedTime];
 
-            // Restart timer with new value
             if (isTimerRunning) {
                 clearInterval(timerInterval);
                 startTimer();
@@ -658,7 +948,6 @@
             const timerEl = document.getElementById('timer');
             timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 
-            // Color logic
             timerEl.classList.remove('warning', 'danger');
             if (timeLeft <= 60) timerEl.classList.add('danger');
             else if (timeLeft <= 180) timerEl.classList.add('warning');
@@ -711,6 +1000,7 @@
         }
 
         function showProfile() {
+            if (isListening) toggleVoiceInput();
             document.getElementById('exam').style.display = 'none';
             document.getElementById('profile').style.display = 'block';
             updateProfile();
@@ -718,20 +1008,30 @@
 
         // NAV
         document.getElementById('dashboardBtn').onclick = () => {
+            if (isListening) toggleVoiceInput();
             ['dashboard', 'exam', 'results', 'profile'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById('dashboard').style.display = 'block';
             document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
             document.getElementById('dashboardBtn').classList.add('active');
         };
         document.getElementById('profileBtn').onclick = () => {
+            if (isListening) toggleVoiceInput();
             ['dashboard', 'exam', 'results', 'profile'].forEach(id => document.getElementById(id).style.display = 'none');
             document.getElementById('profile').style.display = 'block';
             updateProfile();
             document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
             document.getElementById('profileBtn').classList.add('active');
         };
+        document.getElementById('resultsBtn').onclick = () => {
+            if (isListening) toggleVoiceInput();
+            ['dashboard', 'exam', 'profile', 'results'].forEach(id => document.getElementById(id).style.display = 'none');
+            document.getElementById('results').style.display = 'block';
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('resultsBtn').classList.add('active');
+        };
 
         function backToDashboard() {
+            if (isListening) toggleVoiceInput();
             document.getElementById('header').style.display = 'flex';
             document.getElementById('exam').style.display = 'none';
             document.getElementById('results').style.display = 'none';
@@ -764,12 +1064,21 @@
             return list;
         }
 
+        // UPDATED: Render options with A/B/C/D labels
         function renderOptions(q, selected) {
             const c = document.getElementById('options'); c.innerHTML = '';
-            q.options.forEach(opt => {
-                const d = document.createElement('div'); d.className = 'option'; d.textContent = opt;
+            const labels = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, index) => {
+                const d = document.createElement('div'); d.className = 'option';
+                d.innerHTML = `<span class="option-label">${labels[index]}.</span> ${opt}`;
                 d.onclick = () => selectOption(opt);
-                if (selected !== null) { if (opt === q.answer) d.classList.add('correct'); else if (opt === selected) d.classList.add('wrong'); }
+                if (selected !== null) {
+                    if (opt === q.answer) {
+                        d.classList.add('correct');
+                    } else if (opt === selected) {
+                        d.classList.add('wrong');
+                    }
+                }
                 c.appendChild(d);
             });
         }
@@ -802,6 +1111,7 @@
             document.getElementById('exam').style.display = 'block';
             document.getElementById('examTitle').textContent = `Stage ${stage}: ${stage === 8 ? 'MIXED' : getStageName(stage)}`;
             updateTimerDisplay();
+            initRecognition();
             loadQuestion(); updateProgressGrid(); startTimer(); document.getElementById('exam').focus();
         }
 
@@ -817,7 +1127,6 @@
             document.getElementById('questionNum').textContent = `Question ${currentQuestion + 1} of ${TOTAL_QUESTIONS}`;
             updateProgressGrid(); inputBuffer = '';
 
-            // Trigger animation
             const area = document.querySelector('.question-area');
             area.style.animation = 'none';
             area.offsetHeight; // Trigger reflow
@@ -843,19 +1152,30 @@
             }, 1000);
         }
 
+        // UPDATED: Keyboard handler – now maps Z/X/C/V to indices (aligns with A/B/C/D)
         document.addEventListener('keydown', e => {
             if (document.getElementById('exam').style.display !== 'block') return;
             const q = questions[currentQuestion]; if (!q) return; const k = e.key.toLowerCase();
-            if (['z', 'x', 'c', 'v'].includes(k)) { e.preventDefault(); const i = ['z', 'x', 'c', 'v'].indexOf(k); if (i < q.options.length) selectOption(q.options[i]); }
-            else if (k === 'n') { e.preventDefault(); nextQuestion(); }
+            if (['z', 'x', 'c', 'v'].includes(k)) {
+                e.preventDefault();
+                const index = ['z', 'x', 'c', 'v'].indexOf(k);
+                if (index < q.options.length) selectOption(q.options[index]);
+            } else if (k === 'n') { e.preventDefault(); nextQuestion(); }
             else if (k === 'b') { e.preventDefault(); prevQuestion(); }
-            else if (/[0-9]/.test(k)) { e.preventDefault(); inputBuffer += k; const n = parseInt(inputBuffer); if (q.options.includes(n)) { selectOption(n); inputBuffer = ''; } if (inputBuffer.length > 4) inputBuffer = inputBuffer.slice(-4); }
-            else if (k === 'escape' || k === 'backspace') inputBuffer = '';
+            else if (/[0-9]/.test(k)) {
+                e.preventDefault(); inputBuffer += k; const n = parseInt(inputBuffer);
+                if (q.options.includes(n)) { selectOption(n); inputBuffer = ''; }
+                if (inputBuffer.length > 4) inputBuffer = inputBuffer.slice(-4);
+            } else if (k === 'escape' || k === 'backspace') inputBuffer = '';
         });
 
         function endTest() {
+            if (isListening) toggleVoiceInput();
             clearInterval(timerInterval); isTimerRunning = false;
-            for (let i = 0; i < TOTAL_QUESTIONS; i++) { if (!endTimes[i]) endTimes[i] = Date.now(); if (!startTimes[i]) startTimes[i] = endTimes[i] - 3000; }
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                if (!endTimes[i]) endTimes[i] = Date.now();
+                if (!startTimes[i]) startTimes[i] = endTimes[i] - 3000;
+            }
             const totalMs = endTimes.reduce((a, b) => a + b, 0) - startTimes.reduce((a, b) => a + b, 0);
             const correct = answers.reduce((c, ans, i) => ans === questions[i].answer ? c + 1 : c, 0);
             const wrong = answers.filter((a, i) => a !== null && a !== questions[i].answer).length;
@@ -883,8 +1203,10 @@
             let maxT = 0, maxI = 0, minT = Infinity, minI = 0;
             questions.forEach((q, i) => {
                 const sec = (endTimes[i] - startTimes[i]) / 1000;
-                if (sec > maxT) { maxT = sec; maxI = i + 1; } if (sec < minT) { minT = sec; minI = i + 1; }
-                const d = document.createElement('div'); d.className = `question-result ${answers[i] === q.answer ? 'correct' : 'wrong'}`;
+                if (sec > maxT) { maxT = sec; maxI = i + 1; }
+                if (sec < minT) { minT = sec; minI = i + 1; }
+                const d = document.createElement('div');
+                d.className = `question-result ${answers[i] === q.answer ? 'correct' : 'wrong'}`;
                 d.innerHTML = `<strong>Q${i + 1}: ${q.question}</strong><br>Ans: ${answers[i] ?? '—'} | Correct: ${q.answer} | Time: ${sec.toFixed(1)}s`;
                 dt.appendChild(d);
             });
@@ -898,7 +1220,8 @@
         // INIT
         updateTimerDisplay();
         updateProfile();
+        initRecognition();
     </script>
 </body>
 
-</html>8
+</html>
